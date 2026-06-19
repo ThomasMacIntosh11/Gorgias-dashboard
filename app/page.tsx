@@ -6,6 +6,8 @@ import FunnelView from './components/FunnelView';
 import InitiativeKpis from './components/InitiativeKpis';
 import ResolutionChart from './components/ResolutionChart';
 import ProductSignalLog from './components/ProductSignalLog';
+import IntentPerformance from './components/IntentPerformance';
+import EscalationReasons from './components/EscalationReasons';
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState('overview');
@@ -20,7 +22,8 @@ export default function Home() {
           <div>
             <h1 style={{ fontSize: 20, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 2 }}>
               {activeTab === 'overview' && 'Gorgias AI Adoption Dashboard'}
-              {activeTab === 'product' && 'Product Signals'}
+              {activeTab === 'ai' && 'AI Performance'}
+              {activeTab === 'product' && 'CX Signals'}
             </h1>
             <p style={{ fontSize: 13, color: 'var(--text-muted)' }}>
               Last 24 hours · {new Date().toLocaleDateString('en-CA', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
@@ -41,7 +44,15 @@ export default function Home() {
           </>
         )}
 
-        {/* Product */}
+        {/* AI Performance */}
+        {activeTab === 'ai' && (
+          <>
+            <IntentPerformance />
+            <EscalationReasons />
+          </>
+        )}
+
+        {/* CX Signals */}
         {activeTab === 'product' && (
           <ProductSignalLog />
         )}

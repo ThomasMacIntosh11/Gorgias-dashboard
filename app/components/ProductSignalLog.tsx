@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { PRODUCT_SIGNALS, type ProductSignal } from '@/app/lib/data';
+import { CX_SIGNALS, type CXSignal } from '@/app/lib/data';
 import { AlertTriangle, Clock, Sparkles } from 'lucide-react';
 
 const TRIAGE_CONFIG = {
@@ -11,7 +11,7 @@ const TRIAGE_CONFIG = {
   resolved: { label: 'Resolved', cls: 'pill-green' },
 };
 
-function SignalCard({ signal, index }: { signal: ProductSignal; index: number }) {
+function SignalCard({ signal, index }: { signal: CXSignal; index: number }) {
   const [aiRec, setAiRec] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -43,18 +43,20 @@ function SignalCard({ signal, index }: { signal: ProductSignal; index: number })
   return (
     <div style={{
       background: 'var(--surface-2)',
-      border: `1px solid ${isAging ? 'rgba(239,68,68,0.3)' : 'var(--border)'}`,
+      border: '1px solid var(--border)',
       borderRadius: 10,
-      padding: '12px 14px',
-      display: 'flex',
-      flexDirection: 'column',
-      gap: 8,
+      padding: '14px 16px',
+      display: 'grid',
+      gridTemplateColumns: '1fr 1fr',
+      gap: 16,
+      alignItems: 'start',
     }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 8 }}>
-        <div style={{ flex: 1 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 3 }}>
-            {isAging && <AlertTriangle size={13} color="var(--red)" />}
-            <span style={{ fontSize: 13, fontWeight: 500, color: 'var(--text-primary)' }}>
+      {/* Left: signal info */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+        <div>
+          <div style={{ display: 'flex', alignItems: 'flex-start', gap: 6, marginBottom: 4 }}>
+            {isAging && <AlertTriangle size={13} color="var(--red)" style={{ flexShrink: 0, marginTop: 1 }} />}
+            <span style={{ fontSize: 13, fontWeight: 500, color: 'var(--text-primary)', lineHeight: 1.4 }}>
               {signal.issueType}
             </span>
           </div>
@@ -62,30 +64,39 @@ function SignalCard({ signal, index }: { signal: ProductSignal; index: number })
             {signal.merchantSegment}
           </div>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
-          <div style={{ textAlign: 'right' }}>
-            <div style={{ fontSize: 16, fontWeight: 700, color: 'var(--text-primary)' }}>
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          <div>
+            <span style={{ fontSize: 18, fontWeight: 700, color: 'var(--text-primary)' }}>
               {signal.frequency}
-            </div>
-            <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>occurrences</div>
+            </span>
+            <span style={{ fontSize: 11, color: 'var(--text-muted)', marginLeft: 4 }}>tickets</span>
           </div>
           <span className={`pill ${config.cls}`} style={{ fontSize: 11 }}>
             {config.label}
           </span>
         </div>
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+          <Clock size={11} color={isAging ? 'var(--red)' : 'var(--text-muted)'} />
+          <span style={{ fontSize: 11, color: isAging ? 'var(--red)' : 'var(--text-muted)' }}>
+            Open {signal.daysOpen} day{signal.daysOpen !== 1 ? 's' : ''}
+            {isAging ? ' — needs triage' : ''}
+          </span>
+        </div>
       </div>
 
-      {/* AI recommendation */}
+      {/* Right: AI recommendation */}
       <div style={{
         background: 'var(--accent-dim)',
         border: '1px solid var(--accent-mid)',
-        borderRadius: 6,
-        padding: '8px 10px',
+        borderRadius: 8,
+        padding: '10px 12px',
         fontSize: 12,
         lineHeight: 1.5,
-        minHeight: 52,
+        height: '100%',
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginBottom: 5 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginBottom: 6 }}>
           <Sparkles size={12} color="var(--accent-mid)" />
           <span style={{ fontSize: 11, fontWeight: 600, color: 'var(--accent-mid)', letterSpacing: '0.04em', textTransform: 'uppercase' }}>
             AI Recommended Next Step
@@ -93,8 +104,8 @@ function SignalCard({ signal, index }: { signal: ProductSignal; index: number })
         </div>
         {loading ? (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-            <div className="shimmer" style={{ height: 10, borderRadius: 4, width: '85%' }} />
-            <div className="shimmer" style={{ height: 10, borderRadius: 4, width: '65%' }} />
+            <div className="shimmer" style={{ height: 10, borderRadius: 4, width: '90%' }} />
+            <div className="shimmer" style={{ height: 10, borderRadius: 4, width: '70%' }} />
           </div>
         ) : aiRec ? (
           <span style={{ color: 'var(--text-primary)' }}>{aiRec}</span>
@@ -102,28 +113,20 @@ function SignalCard({ signal, index }: { signal: ProductSignal; index: number })
           <span style={{ color: 'var(--text-muted)' }}>Recommendation unavailable.</span>
         )}
       </div>
-
-      <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
-        <Clock size={11} color={isAging ? 'var(--red)' : 'var(--text-muted)'} />
-        <span style={{ fontSize: 11, color: isAging ? 'var(--red)' : 'var(--text-muted)' }}>
-          Open {signal.daysOpen} day{signal.daysOpen !== 1 ? 's' : ''}
-          {isAging ? ' — needs triage' : ''}
-        </span>
-      </div>
     </div>
   );
 }
 
 export default function ProductSignalLog() {
-  const sortedSignals = [...PRODUCT_SIGNALS].sort((a, b) => b.frequency - a.frequency);
+  const sortedSignals = [...CX_SIGNALS].sort((a, b) => b.frequency - a.frequency);
 
   return (
     <div className="card" style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div>
-          <span className="label">Product Signal Log</span>
+          <span className="label">CX Signals</span>
           <p style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 2 }}>
-            AI-synthesized from tickets, CSM notes, resolution failures
+            Patterns surfaced from CX tickets, ready to pass to Product
           </p>
         </div>
         <span className="pill pill-amber" style={{ fontSize: 11 }}>
@@ -136,7 +139,6 @@ export default function ProductSignalLog() {
           <SignalCard key={signal.id} signal={signal} index={i} />
         ))}
       </div>
-
     </div>
   );
 }

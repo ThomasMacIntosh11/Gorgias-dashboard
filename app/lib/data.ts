@@ -24,7 +24,7 @@ export interface CsmRep {
   accountsAtRisk: number;
 }
 
-export interface ProductSignal {
+export interface CXSignal {
   id: string;
   issueType: string;
   frequency: number;
@@ -32,6 +32,23 @@ export interface ProductSignal {
   recommendedAction: string;
   triageStatus: 'pending' | 'in_sprint' | 'backlog' | 'resolved';
   daysOpen: number;
+}
+
+export interface IntentPerformance {
+  id: string;
+  intentName: string;
+  volume: number;
+  aiResolutionRate: number;
+  handoffRate: number;
+  trend: 'up' | 'down' | 'flat';
+}
+
+export interface EscalationReason {
+  id: string;
+  reason: string;
+  description: string;
+  count: number;
+  pct: number;
 }
 
 export interface FunnelSnapshot {
@@ -67,15 +84,15 @@ function daysAgo(days: number): string {
 }
 
 const MERCHANT_NAMES = [
-  'Maple & Co', 'Dune Collective', 'Haus of Bloom', 'Carver Supply', 'Shoreline Goods',
-  'Verdant Market', 'Ollie & June', 'Peak Provisions', 'Solstice Co', 'Crest Supply',
-  'Ember & Oak', 'Tide & Trunk', 'Fold Studio', 'Grounded Supply', 'Brim Collective',
-  'Alto Goods', 'Haven Market', 'Drift & Co', 'Kindred Supply', 'Basin & Co',
-  'Clover & Co', 'Summit Store', 'Pines Collective', 'Ridge Supply', 'Stone & Fern',
-  'Harbor Co', 'Glow Market', 'Slate Supply', 'Birch & Bloom', 'Compass Co',
+  'Northfold Co', 'Cinder & Stone', 'Bloom Bureau', 'Westbrook Supply', 'Coastal Thread',
+  'Lush Collective', 'Finch & Fox', 'Cedar Provisions', 'Equinox Co', 'Bluff Supply',
+  'Flint & Fern', 'Salt & Timber', 'Stitch Studio', 'Rootwork Supply', 'Brace Collective',
+  'Mesa Goods', 'Hollow Market', 'Swell & Co', 'Kindred Works', 'Vale & Co',
+  'Thistle & Co', 'Ridgeline Store', 'Grove Collective', 'Dusk Supply', 'Chalk & Moss',
+  'Inlet Co', 'Luminary Market', 'Quartz Supply', 'Aspen & Bloom', 'True North Co',
 ];
 
-const CSM_NAMES = ['Sarah K.', 'Marcus T.', 'Priya N.', 'Jordan L.', 'Casey M.'];
+const CSM_NAMES = ['Emma R.', 'Daniel W.', 'Aisha M.', 'Tyler B.', 'Morgan S.'];
 
 function generateMerchants(): Merchant[] {
   return MERCHANT_NAMES.map((name, i) => {
@@ -126,55 +143,55 @@ export const FUNNEL_DATA: FunnelSnapshot[] = [
     stage: 'not_enabled',
     label: 'Not Enabled',
     count: MERCHANTS.filter(m => m.stage === 'not_enabled').length,
-    pct: 45,
-    delta24h: -2,
-    delta1w: -18,
-    delta1m: -64,
-    delta1q: -210,
+    pct: 43,
+    delta24h: -1,
+    delta1w: -15,
+    delta1m: -58,
+    delta1q: -193,
     color: '#ef4444',
   },
   {
     stage: 'enabled_not_configured',
     label: 'Enabled, Not Configured',
     count: MERCHANTS.filter(m => m.stage === 'enabled_not_configured').length,
-    pct: 15,
-    delta24h: +1,
-    delta1w: +4,
-    delta1m: -12,
-    delta1q: -38,
+    pct: 18,
+    delta24h: +2,
+    delta1w: +5,
+    delta1m: -9,
+    delta1q: -31,
     color: '#f97316',
   },
   {
     stage: 'low_resolution',
     label: 'Low Resolution (<10%)',
     count: MERCHANTS.filter(m => m.stage === 'low_resolution').length,
-    pct: 20,
+    pct: 21,
     delta24h: 0,
-    delta1w: +6,
-    delta1m: +19,
-    delta1q: +42,
+    delta1w: +8,
+    delta1m: +22,
+    delta1q: +51,
     color: '#eab308',
   },
   {
     stage: 'moderate',
     label: 'Moderate (10–40%)',
     count: MERCHANTS.filter(m => m.stage === 'moderate').length,
-    pct: 12,
-    delta24h: +3,
-    delta1w: +14,
-    delta1m: +38,
-    delta1q: +95,
+    pct: 13,
+    delta24h: +2,
+    delta1w: +11,
+    delta1m: +34,
+    delta1q: +87,
     color: '#E86140',
   },
   {
     stage: 'high',
     label: 'High Resolution (40%+)',
     count: MERCHANTS.filter(m => m.stage === 'high').length,
-    pct: 8,
-    delta24h: +2,
-    delta1w: +22,
-    delta1m: +67,
-    delta1q: +184,
+    pct: 5,
+    delta24h: +1,
+    delta1w: +17,
+    delta1m: +54,
+    delta1q: +162,
     color: '#22c55e',
   },
 ];
@@ -186,52 +203,72 @@ export const CSM_REPS: CsmRep[] = CSM_NAMES.map(name => ({
   accountsAtRisk: randomBetween(3, 12),
 }));
 
-export const PRODUCT_SIGNALS: ProductSignal[] = [
+export const CX_SIGNALS: CXSignal[] = [
   {
-    id: 'PS001',
-    issueType: 'Order tracking intent fails on 3PL integrations',
-    frequency: 142,
-    merchantSegment: 'Mid-market, Apparel',
-    recommendedAction: 'Expand intent to support ShipBob / ShipStation tokens',
+    id: 'CX001',
+    issueType: 'Customers contact support to re-send order confirmation emails',
+    frequency: 118,
+    merchantSegment: 'Mid-market, Home & Lifestyle',
+    recommendedAction: 'Add self-serve confirmation email resend option to the order status page',
     triageStatus: 'in_sprint',
     daysOpen: 4,
   },
   {
-    id: 'PS002',
-    issueType: 'Refund flow breaks when order >90 days old',
-    frequency: 89,
+    id: 'CX002',
+    issueType: 'Return portal rejects orders placed as guest — customers stuck',
+    frequency: 84,
     merchantSegment: 'SMB, All verticals',
-    recommendedAction: 'Add conditional logic for aged orders',
-    triageStatus: 'pending',
-    daysOpen: 9,
-  },
-  {
-    id: 'PS003',
-    issueType: 'AI escalates "where is my order" during setup wizard',
-    frequency: 67,
-    merchantSegment: 'New merchants (<30 days)',
-    recommendedAction: 'Pre-seed WISMO intent in onboarding flow',
-    triageStatus: 'backlog',
-    daysOpen: 14,
-  },
-  {
-    id: 'PS004',
-    issueType: 'Discount code intent does not handle stacked discounts',
-    frequency: 54,
-    merchantSegment: 'SMB, DTC brands',
-    recommendedAction: 'Update intent logic for multi-code cart scenarios',
-    triageStatus: 'pending',
-    daysOpen: 6,
-  },
-  {
-    id: 'PS005',
-    issueType: 'Spanish-language tickets dropped by AI, not escalated',
-    frequency: 38,
-    merchantSegment: 'US merchants with LATAM customers',
-    recommendedAction: 'Enable multilingual fallback routing',
+    recommendedAction: 'Allow guest-order returns via email + order number lookup, bypassing account requirement',
     triageStatus: 'pending',
     daysOpen: 11,
   },
+  {
+    id: 'CX003',
+    issueType: 'Store credit not accepted at checkout when combined with a promo code',
+    frequency: 69,
+    merchantSegment: 'All segments',
+    recommendedAction: 'Fix checkout discount stacking logic to allow store credit alongside promo codes',
+    triageStatus: 'backlog',
+    daysOpen: 21,
+  },
+  {
+    id: 'CX004',
+    issueType: 'Subscription pause option not visible — customers cancelling instead',
+    frequency: 57,
+    merchantSegment: 'Mid-market, Food & Wellness',
+    recommendedAction: 'Surface the pause option earlier in the cancellation flow to reduce involuntary churn',
+    triageStatus: 'pending',
+    daysOpen: 8,
+  },
+  {
+    id: 'CX005',
+    issueType: 'Address change requests arriving after cut-off — no self-serve option',
+    frequency: 38,
+    merchantSegment: 'SMB, DTC brands',
+    recommendedAction: 'Build a timed self-serve address edit window in the order confirmation page before fulfilment locks',
+    triageStatus: 'pending',
+    daysOpen: 6,
+  },
+];
+
+export const INTENT_PERFORMANCE: IntentPerformance[] = [
+  { id: 'INT001', intentName: 'Where is my order (WISMO)', volume: 4821, aiResolutionRate: 61, handoffRate: 14, trend: 'up' },
+  { id: 'INT002', intentName: 'Refund request', volume: 3104, aiResolutionRate: 38, handoffRate: 31, trend: 'flat' },
+  { id: 'INT003', intentName: 'Order cancellation', volume: 2267, aiResolutionRate: 44, handoffRate: 22, trend: 'up' },
+  { id: 'INT004', intentName: 'Exchange / return initiation', volume: 1893, aiResolutionRate: 27, handoffRate: 48, trend: 'down' },
+  { id: 'INT005', intentName: 'Discount code help', volume: 1456, aiResolutionRate: 71, handoffRate: 9, trend: 'up' },
+  { id: 'INT006', intentName: 'Shipping address change', volume: 987, aiResolutionRate: 19, handoffRate: 61, trend: 'down' },
+  { id: 'INT007', intentName: 'Account login / access', volume: 834, aiResolutionRate: 55, handoffRate: 18, trend: 'flat' },
+  { id: 'INT008', intentName: 'Product availability', volume: 612, aiResolutionRate: 83, handoffRate: 5, trend: 'up' },
+];
+
+export const ESCALATION_REASONS: EscalationReason[] = [
+  { id: 'ESC001', reason: 'No matching intent', description: 'Customer query did not match any configured intent — AI passed to human without attempting a response', count: 2814, pct: 34 },
+  { id: 'ESC002', reason: 'Low confidence score', description: 'AI matched an intent but confidence was below the threshold, triggering a safe handoff', count: 1976, pct: 24 },
+  { id: 'ESC003', reason: 'Policy rule triggered', description: 'A merchant-configured rule (e.g. VIP customer, order value > $500) forced escalation regardless of AI capability', count: 1322, pct: 16 },
+  { id: 'ESC004', reason: 'Customer requested human', description: 'Customer explicitly asked to speak with a person mid-conversation', count: 1074, pct: 13 },
+  { id: 'ESC005', reason: 'Multi-turn timeout', description: 'Conversation exceeded the max AI turn limit without reaching a resolution', count: 743, pct: 9 },
+  { id: 'ESC006', reason: 'Sensitive topic detected', description: 'AI flagged the conversation as emotionally sensitive (complaint, threat, distress) and deferred to a human', count: 331, pct: 4 },
 ];
 
 // 24h resolution rate trend (hourly buckets, last 24h)
@@ -292,17 +329,17 @@ export const MONTHLY_TREND = generate30dTrend();
 
 // Headline KPIs
 export const KPI = {
-  highAdoptionPct: 8.2,
-  highAdoptionTarget: 16.0,
-  highAdoptionDelta24h: +0.3,
-  onboardingCompletionRate: 67,
-  onboardingTarget: 85,
-  onboardingDelta24h: +2,
-  moderateToHighConversionRate: 38,
+  highAdoptionPct: 6.8,
+  highAdoptionTarget: 15.0,
+  highAdoptionDelta24h: +0.2,
+  onboardingCompletionRate: 71,
+  onboardingTarget: 88,
+  onboardingDelta24h: +1,
+  moderateToHighConversionRate: 33,
   moderateToHighTarget: 50,
-  aiResolutionMedian: 27,
-  totalMerchants: 17000,
-  aiEnabledPct: 55,
-  activelyUsingPct: 40,
-  nrrTrend: -1.2,
+  aiResolutionMedian: 24,
+  totalMerchants: 12400,
+  aiEnabledPct: 51,
+  activelyUsingPct: 37,
+  nrrTrend: -0.8,
 };

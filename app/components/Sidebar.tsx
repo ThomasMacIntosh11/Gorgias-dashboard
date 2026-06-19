@@ -1,6 +1,6 @@
 'use client';
 
-import { BarChart2, Zap } from 'lucide-react';
+import { BarChart2, Zap, Brain } from 'lucide-react';
 
 interface SidebarProps {
   activeTab: string;
@@ -9,7 +9,8 @@ interface SidebarProps {
 
 const NAV_ITEMS = [
   { id: 'overview', label: 'Overview', icon: BarChart2 },
-  { id: 'product', label: 'Product Signals', icon: Zap },
+  { id: 'ai', label: 'AI Performance', icon: Brain },
+  { id: 'product', label: 'CX Signals', icon: Zap },
 ];
 
 export default function Sidebar({ activeTab, setActiveTab }: SidebarProps) {

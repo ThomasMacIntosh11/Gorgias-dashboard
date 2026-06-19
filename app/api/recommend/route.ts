@@ -2,6 +2,7 @@ import Anthropic from '@anthropic-ai/sdk';
 
 const client = new Anthropic();
 const cache = new Map<string, string>();
+// Cache keyed by issueType — clears on server restart
 
 export async function POST(request: Request) {
   const { issueType, frequency, merchantSegment, daysOpen, triageStatus, recommendedAction } = await request.json();
@@ -16,8 +17,9 @@ export async function POST(request: Request) {
       max_tokens: 128,
       system:
         'You are a product advisor for Gorgias, an AI-powered customer support platform for e-commerce merchants. ' +
-        'Given a product signal, write exactly one clear, direct sentence recommending what the product team should do. ' +
-        'Name the specific fix and the expected outcome. No preamble, no bullet points — just the single sentence.',
+        'A CX team has surfaced a recurring customer pain point and wants to pass it to Product as a signal. ' +
+        'Write exactly one clear, direct sentence recommending what the product team should build or fix. ' +
+        'Name the specific change and the expected customer outcome. No preamble, no bullet points — just the single sentence.',
       messages: [
         {
           role: 'user',
