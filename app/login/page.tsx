@@ -60,6 +60,7 @@ export default function LoginPage() {
             placeholder="Password"
             value={password}
             onChange={e => setPassword(e.target.value)}
+            onInput={e => setPassword((e.target as HTMLInputElement).value)}
             autoFocus
             style={{
               width: '100%',
